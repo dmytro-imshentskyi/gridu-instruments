@@ -7,4 +7,4 @@ Project contains 2 files:
 
 Tests are presented by InstrumentCsvSpec. Just launch it and enjoy power of TDD.
 
-To kick off Spark application, please import project as SBT file and run ClickStreamAnalyzer main class. Result will be printed in the console.
+To kick off Spark application, please import project as SBT file and run Demo.scala. Result will be printed in the console.
