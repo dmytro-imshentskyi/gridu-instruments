@@ -1,4 +1,4 @@
-Hello! This is my pet project for boosting knowledge and experience in BigData and Spark API.
+Hello! This is my test project for boosting knowledge and show my experience in BigData and Spark API.
 
 All sub-tasks have been completed with using DataFrame API.
 Project contains 2 files:
