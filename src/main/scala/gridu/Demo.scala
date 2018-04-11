@@ -8,6 +8,9 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
 
+/**
+  * Driver program that kicks off Spark in local mode
+  */
 object Demo {
 
   def main(args: Array[String]): Unit = {
@@ -34,7 +37,9 @@ object Demo {
     printResult(meanForInstrument2(upToDateInstrumentsDf))
 
     //TASK #3. INSTRUMENT3 – any other statistical calculation that we can compute "on-the-fly" as we read the file
-    println("Median value for INSTRUMENT3 is " + meanForInstrument2(upToDateInstrumentsDf))
+    println("+-------------------------------------------------------+")
+    println("Median value for INSTRUMENT3 is " + medianForInstrument3(upToDateInstrumentsDf))
+    println("+-------------------------------------------------------+")
 
     //TASK #4. For any other instrument from the input file - sum of the newest 10 elements
     printResult(topNInstruments3(upToDateInstrumentsDf, 10))
@@ -55,9 +60,14 @@ object Demo {
       .agg(round(mean($"value"), 4).alias("mean"))
   }
 
-  def medianForInstrument3(ds: Dataset[Instrument]): Double = {
-    ds.filter(item => "INSTRUMENT3".contentEquals(item.id))
-      .stat.approxQuantile("value", Array(0.5), 0.0)(0)
+  def medianForInstrument3(ds: Dataset[Instrument]): Option[Double] = {
+    val result = ds.filter(item => "INSTRUMENT3".contentEquals(item.id))
+      .stat.approxQuantile("value", Array(0.5), 0.0)
+    if(result.isEmpty) {
+      None
+    } else {
+      Some(result(0))
+    }
   }
 
   def topNInstruments3(ds: Dataset[Instrument], n: Int)(implicit sparkSession: SparkSession): DataFrame = {

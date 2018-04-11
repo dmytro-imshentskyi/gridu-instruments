@@ -1,6 +1,7 @@
+package gridu
+
 import java.sql.Date
 
-import gridu.{Demo, Instrument}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.Dataset
 import org.scalatest.FlatSpec
@@ -28,6 +29,8 @@ class InstrumentCsvSpec extends FlatSpec
 
   val instruments: Dataset[Instrument] = spark.createDataset(instrumentsAsRdd).cache()
 
+  val emptyInstruments: Dataset[Instrument] = spark.emptyDataset[Instrument]
+
   "Task #1. Calculated mean for INSTRUMENT1" should "be equal to 25.6725" in {
     val result = Demo.meanForInstrument1(instruments)(spark).collectAsList()
     assertResult("INSTRUMENT1")(result.get(0).getAs[String]("id"))
@@ -44,7 +47,7 @@ class InstrumentCsvSpec extends FlatSpec
 
   "Task #3. Calculated median for INSTRUMENT3 " should "be equal to 29.19" in {
     val result = Demo.medianForInstrument3(instruments)
-    assertResult(29.19)(result)
+    assertResult(Some(29.19))(result)
   }
 
   "Task #4. First and second INSTRUMENT3 " should "contains values 29.19 and 9.11 respectively" in {
@@ -57,5 +60,19 @@ class InstrumentCsvSpec extends FlatSpec
     assertResult("INSTRUMENT3")(result.get(1).getAs[String]("id"))
     assertResult(9.11)(result.get(1).getAs[Double]("value"))
     assertResult(2)(result.get(1).getAs[Int]("rank"))
+  }
+
+  "TASK #1, 2, 3, 4. Calculated values for all tasks with empty dataset" should "be empty" in {
+    val result1 = Demo.meanForInstrument1(emptyInstruments)(spark).collectAsList()
+    assert(result1.isEmpty)
+
+    val result2 = Demo.meanForInstrument2(emptyInstruments)(spark).collectAsList()
+    assert(result2.isEmpty)
+
+    val result3 = Demo.medianForInstrument3(emptyInstruments)
+    assertResult(None)(result3)
+
+    val result4 = Demo.topNInstruments3(emptyInstruments, 2)(spark).collectAsList()
+    assert(result4.isEmpty)
   }
 }
